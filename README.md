@@ -199,6 +199,20 @@ Cada vez que subas cambios a GitHub, Cloudflare publica la versión nueva sola. 
    - **Build output directory**: `publicar`
 4. Pulsa **Save and Deploy**. En uno o dos minutos estará en `https://<nombre>.pages.dev`.
 
+### Si Cloudflare te lleva a «Workers» en vez de «Pages»
+
+Cloudflare ha juntado Workers y Pages en el mismo menú y a veces el asistente crea un *Worker*
+(la pantalla dice «Configure your Worker project» y pide un *Deploy command*). También funciona, gracias
+al archivo [`wrangler.jsonc`](wrangler.jsonc):
+
+- **Project name**: el mismo que `name` en `wrangler.jsonc` (ahora `comparador`). Si eliges otro, cámbialo también ahí.
+- **Build command**: `node scripts/preparar-publicacion.mjs`
+- **Deploy command**: `npx wrangler deploy` (el que viene puesto)
+- **Path**: `/`
+
+La diferencia es la dirección: en Workers es `https://<nombre>.<subdominio-de-tu-cuenta>.workers.dev`.
+El subdominio de la cuenta se puede cambiar una vez en *Workers & Pages → Account details → Subdomain*.
+
 ### Opción B: subir la carpeta a mano
 
 Sin GitHub. Pero ten en cuenta que un proyecto creado así **no se puede conectar después a Git**: cada

@@ -70,3 +70,11 @@ test('publicación: _headers con la misma CSP que index.html, pero no aplicada a
   assert.ok(archivos.includes('sw.js') && archivos.includes('index.html'));
   assert.ok(!archivos.some((a) => /^(tests|scripts|ejemplos)\/|README|package\.json/.test(a)));
 });
+
+test('wrangler.jsonc publica la carpeta publicar/ como archivos estáticos', () => {
+  const texto = leer('wrangler.jsonc').replace(/^\s*\/\/.*$/gm, '');
+  const config = JSON.parse(texto);
+  assert.ok(config.name && config.compatibility_date);
+  assert.equal(config.assets.directory, './publicar');
+  assert.equal(config.main, undefined, 'sin código de servidor');
+});

@@ -1,0 +1,12 @@
+// Configuración para publicar en Cloudflare Workers (archivos estáticos, sin código de servidor).
+// En Cloudflare: Build command = node scripts/preparar-publicacion.mjs · Deploy command = npx wrangler deploy
+// "name" debe coincidir con el "Project name" del panel de Cloudflare: la web quedará en
+// https://<name>.<subdominio-de-tu-cuenta>.workers.dev
+{
+  "name": "comparador",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./publicar",
+    "not_found_handling": "single-page-application"
+  }
+}
