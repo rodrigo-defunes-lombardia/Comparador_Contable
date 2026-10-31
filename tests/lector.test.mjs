@@ -110,7 +110,7 @@ test('exportación a Excel: hojas, fechas reales, formato € y cabeceras fijas'
   const r = conciliar(filasAMovimientos(hojas.contabilidad, { origen: 'contabilidad' }).movimientos,
     filasAMovimientos(hojas.banco, { origen: 'banco' }).movimientos);
   const { bytes, nombre } = generarExcel(r, { archivoContabilidad: 'c.xlsx', archivoBanco: 'b.xlsx' });
-  assert.equal(nombre, 'conciliacion_2026-03.xlsx');
+  assert.equal(nombre, 'comparacion_2026-03.xlsx');
   const libro = XLSX.read(bytes, { type: 'array', cellNF: true });
   assert.deepEqual(libro.SheetNames, ['Resumen', 'Desfases claros', 'Desfases dudosos', 'Por fecha', 'Coincidencias']);
   const claros = libro.Sheets['Desfases claros'];

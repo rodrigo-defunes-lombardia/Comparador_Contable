@@ -1,4 +1,4 @@
-// Umbrales y parámetros configurables del conciliador.
+// Umbrales y parámetros configurables del comparador.
 // Cambia aquí los valores; el resto del código los importa desde este archivo.
 
 /** Diferencia máxima de días (en valor absoluto) para considerar dos movimientos "del mismo momento". */

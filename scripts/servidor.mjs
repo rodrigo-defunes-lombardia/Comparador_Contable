@@ -26,4 +26,4 @@ createServer(async (req, res) => {
   } catch {
     res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' }).end('No encontrado');
   }
-}).listen(PUERTO, '127.0.0.1', () => console.log(`Conciliador en http://localhost:${PUERTO}`));
+}).listen(PUERTO, '127.0.0.1', () => console.log(`Comparador en http://localhost:${PUERTO}`));

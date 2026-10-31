@@ -3,7 +3,7 @@
 (function () {
   var raiz = document.documentElement;
   var prefs = {};
-  try { prefs = JSON.parse(localStorage.getItem('conciliador-preferencias') || '{}') || {}; } catch (e) { prefs = {}; }
+  try { prefs = JSON.parse(localStorage.getItem('comparador-preferencias') || '{}') || {}; } catch (e) { prefs = {}; }
   var letras = ['normal', 'grande', 'muy-grande'];
   var temas = ['auto', 'claro', 'oscuro', 'contraste'];
   raiz.setAttribute('data-letra', letras.indexOf(prefs.letra) >= 0 ? prefs.letra : 'normal');

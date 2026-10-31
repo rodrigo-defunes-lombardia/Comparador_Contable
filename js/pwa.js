@@ -69,7 +69,7 @@ function mostrarAvisoVersion(registro, hayTrabajo) {
   actualizar.append(icono('reiniciar'), document.createTextNode('Actualizar'));
   actualizar.addEventListener('click', () => {
     actualizar.disabled = true;
-    sessionStorageSeguro('conciliador-actualizando', '1');
+    sessionStorageSeguro('comparador-actualizando', '1');
     if (registro.waiting) registro.waiting.postMessage('ACTUALIZAR');
     else window.location.reload();
   });
@@ -112,9 +112,9 @@ async function registrarServiceWorker(hayTrabajo) {
   let recargando = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     // Solo se recarga si la usuaria pulsó "Actualizar" (no en la primera instalación).
-    if (recargando || !sessionStorageSeguro('conciliador-actualizando')) { pedirVersion(); return; }
+    if (recargando || !sessionStorageSeguro('comparador-actualizando')) { pedirVersion(); return; }
     recargando = true;
-    sessionStorageSeguro('conciliador-actualizando', null);
+    sessionStorageSeguro('comparador-actualizando', null);
     window.location.reload();
   });
 
@@ -125,7 +125,7 @@ async function registrarServiceWorker(hayTrabajo) {
     console.warn('No se ha podido activar el modo sin conexión.', e);
     return;
   }
-  sessionStorageSeguro('conciliador-actualizando', null);
+  sessionStorageSeguro('comparador-actualizando', null);
   pedirVersion();
 
   const vigilar = (trabajador) => {

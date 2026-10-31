@@ -1,7 +1,7 @@
 {
   "id": "./",
-  "name": "Conciliador contable",
-  "short_name": "Conciliador",
+  "name": "Comparador contable",
+  "short_name": "Comparador",
   "description": "Compara los movimientos de la contabilidad con los del extracto del banco. Todo ocurre en tu ordenador.",
   "lang": "es",
   "dir": "ltr",

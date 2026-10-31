@@ -55,7 +55,7 @@ function anunciar(texto) {
 function guardarPreferencias() {
   const raiz = document.documentElement;
   try {
-    localStorage.setItem('conciliador-preferencias', JSON.stringify({ letra: raiz.dataset.letra, tema: raiz.dataset.tema }));
+    localStorage.setItem('comparador-preferencias', JSON.stringify({ letra: raiz.dataset.letra, tema: raiz.dataset.tema }));
   } catch { /* sin almacenamiento: no pasa nada */ }
 }
 

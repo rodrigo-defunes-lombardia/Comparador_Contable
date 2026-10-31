@@ -1,5 +1,5 @@
 {
-  "name": "conciliador-contable",
+  "name": "comparador-contable",
   "version": "1.0.0",
   "description": "Compara los movimientos de la contabilidad con los del extracto del banco, en el navegador.",
   "private": true,

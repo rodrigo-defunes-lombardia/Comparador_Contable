@@ -1,4 +1,4 @@
-# Conciliador contable
+# Comparador contable
 
 Web sencilla para comprobar que los movimientos de la aplicación de contabilidad coinciden con los del
 extracto del banco. Se eligen los dos Excel del mes y la web dice qué coincide, qué falta y qué hay que revisar.
@@ -192,7 +192,7 @@ Cada vez que subas cambios a GitHub, Cloudflare publica la versión nueva sola. 
 2. En el panel de Cloudflare: **Workers & Pages → Create application → Pages → Connect to Git**,
    autoriza a Cloudflare a ver ese repositorio y elígelo.
 3. Configuración de la compilación:
-   - **Project name**: el nombre que quieras para la dirección (por ejemplo `conciliador` → `conciliador.pages.dev`).
+   - **Project name**: el nombre que quieras para la dirección (por ejemplo `comparador` → `comparador.pages.dev`).
    - **Production branch**: `main`
    - **Framework preset**: `None`
    - **Build command**: `node scripts/preparar-publicacion.mjs`

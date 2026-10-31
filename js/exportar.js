@@ -131,10 +131,10 @@ export function generarExcel(resultado, info = {}) {
   const final = fijarCabeceras(new Uint8Array(bytes), libro);
 
   const ref = pb || pc;
-  let nombre = 'conciliacion.xlsx';
+  let nombre = 'comparacion.xlsx';
   if (ref) {
     const { anio, mes } = componentesDeDia(ref.desde);
-    nombre = `conciliacion_${anio}-${String(mes).padStart(2, '0')}.xlsx`;
+    nombre = `comparacion_${anio}-${String(mes).padStart(2, '0')}.xlsx`;
   }
   return { bytes: final, nombre };
 }

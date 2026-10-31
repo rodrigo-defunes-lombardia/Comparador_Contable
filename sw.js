@@ -6,7 +6,7 @@
 // actualiza también ARCHIVOS (los tests comprueban que la lista está completa).
 
 const CACHE_VERSION = '2026-10-31.1';
-const PREFIJO = 'conciliador-';
+const PREFIJO = 'comparador-';
 const CACHE = `${PREFIJO}${CACHE_VERSION}`;
 
 const ARCHIVOS = [
