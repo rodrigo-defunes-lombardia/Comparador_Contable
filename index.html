@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; manifest-src 'self'; worker-src 'self'; form-action 'none'; base-uri 'none'; object-src 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="description" content="Compara los movimientos de la contabilidad con los del extracto del banco. Todo ocurre en tu ordenador.">
+  <title>Conciliador contable</title>
+  <meta name="theme-color" content="#0a58a8">
+  <meta name="apple-mobile-web-app-title" content="Conciliador">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="img/icono.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/estilos.css">
+  <!-- Aplica tamaño de letra y tema antes de pintar la página (evita parpadeos). -->
+  <script src="js/preferencias-inicio.js"></script>
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <a class="saltar" href="#contenido">Saltar al contenido</a>
+
+  <header class="cabecera">
+    <div class="contenedor cabecera__dentro">
+      <div class="cabecera__titulo">
+        <h1>Conciliador contable</h1>
+        <p class="cabecera__lema">Compara tu contabilidad con el extracto del banco.
+          <span class="privacidad"><span class="icono" data-icono="candado" aria-hidden="true"></span>Tus archivos no salen de este ordenador.</span></p>
+        <div class="instalar">
+          <button type="button" class="boton boton--secundario boton--pequeno" id="boton-instalar" hidden>
+            <span class="icono" data-icono="descargar" aria-hidden="true"></span>Instalar la aplicación
+          </button>
+          <p class="instalar__nota" id="nota-safari" hidden>
+            <span class="icono" data-icono="info" aria-hidden="true"></span>Para instalarla en Safari: menú <strong>Archivo &gt; Añadir al Dock</strong>.
+          </p>
+        </div>
+      </div>
+
+      <div class="preferencias" role="group" aria-label="Preferencias de visualización">
+        <fieldset class="segmentado">
+          <legend>Tamaño de letra</legend>
+          <div class="segmentado__opciones">
+            <input type="radio" name="letra" id="letra-normal" value="normal" checked>
+            <label for="letra-normal">Normal</label>
+            <input type="radio" name="letra" id="letra-grande" value="grande">
+            <label for="letra-grande" class="letra-grande">Grande</label>
+            <input type="radio" name="letra" id="letra-muy-grande" value="muy-grande">
+            <label for="letra-muy-grande" class="letra-muy-grande">Muy grande</label>
+          </div>
+        </fieldset>
+        <fieldset class="segmentado">
+          <legend>Colores</legend>
+          <div class="segmentado__opciones">
+            <input type="radio" name="tema" id="tema-auto" value="auto" checked>
+            <label for="tema-auto">Automático</label>
+            <input type="radio" name="tema" id="tema-claro" value="claro">
+            <label for="tema-claro">Claro</label>
+            <input type="radio" name="tema" id="tema-oscuro" value="oscuro">
+            <label for="tema-oscuro">Oscuro</label>
+            <input type="radio" name="tema" id="tema-contraste" value="contraste">
+            <label for="tema-contraste">Alto contraste</label>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+  </header>
+
+  <main id="contenido" tabindex="-1">
+    <div class="contenedor">
+      <section class="carga" aria-labelledby="titulo-carga">
+        <h2 id="titulo-carga">1. Elige los dos archivos</h2>
+        <p class="ayuda">Exporta un Excel de tu aplicación de contabilidad y otro del banco, del mismo periodo.
+          Cada archivo debe tener 4 columnas en este orden: <strong>fecha, concepto, entradas y salidas</strong>.
+          Se aceptan archivos .xlsx, .xls y .csv.</p>
+
+        <div class="zonas">
+          <div class="zona" id="zona-contabilidad" data-origen="contabilidad">
+            <h3 class="zona__titulo"><span class="icono" data-icono="libro" aria-hidden="true"></span>Contabilidad</h3>
+            <p class="zona__pista">Arrastra aquí el Excel de tu aplicación de contabilidad, o</p>
+            <input class="oculto-visual archivo" type="file" id="archivo-contabilidad"
+                   accept=".xlsx,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv"
+                   aria-describedby="estado-contabilidad">
+            <label class="boton boton--secundario" for="archivo-contabilidad">
+              <span class="icono" data-icono="carpeta" aria-hidden="true"></span><span class="zona__accion">Elegir archivo de contabilidad</span>
+            </label>
+            <div class="zona__estado" id="estado-contabilidad"></div>
+          </div>
+
+          <div class="zona" id="zona-banco" data-origen="banco">
+            <h3 class="zona__titulo"><span class="icono" data-icono="banco" aria-hidden="true"></span>Banco</h3>
+            <p class="zona__pista">Arrastra aquí el Excel del extracto del banco, o</p>
+            <input class="oculto-visual archivo" type="file" id="archivo-banco"
+                   accept=".xlsx,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv"
+                   aria-describedby="estado-banco">
+            <label class="boton boton--secundario" for="archivo-banco">
+              <span class="icono" data-icono="carpeta" aria-hidden="true"></span><span class="zona__accion">Elegir archivo del banco</span>
+            </label>
+            <div class="zona__estado" id="estado-banco"></div>
+          </div>
+        </div>
+
+        <div class="acciones-carga">
+          <button type="button" class="boton boton--terciario" id="boton-ejemplo">
+            <span class="icono" data-icono="prueba" aria-hidden="true"></span>Probar con datos de ejemplo
+          </button>
+          <button type="button" class="boton boton--terciario" id="boton-reiniciar" hidden>
+            <span class="icono" data-icono="reiniciar" aria-hidden="true"></span>Empezar de nuevo
+          </button>
+        </div>
+      </section>
+
+      <section class="resultados" id="resultados" aria-labelledby="titulo-resultados" hidden>
+        <div class="resultados__cabecera">
+          <h2 id="titulo-resultados" tabindex="-1">2. Resultado de la comparación</h2>
+          <div class="resultados__acciones">
+            <button type="button" class="boton boton--primario" id="boton-exportar">
+              <span class="icono" data-icono="descargar" aria-hidden="true"></span>Exportar a Excel
+            </button>
+            <button type="button" class="boton boton--terciario" id="boton-imprimir">
+              <span class="icono" data-icono="imprimir" aria-hidden="true"></span>Imprimir
+            </button>
+          </div>
+        </div>
+        <p class="solo-impresion" id="cabecera-impresion"></p>
+        <p class="ayuda" id="ejemplo-aviso" hidden><span class="icono" data-icono="info" aria-hidden="true"></span>Estás viendo <strong>datos de ejemplo ficticios</strong>. Para comparar los tuyos, pulsa «Empezar de nuevo».</p>
+
+        <div class="tarjetas" id="tarjetas"></div>
+
+        <section class="tabla-fechas" aria-labelledby="titulo-tabla">
+          <div class="tabla-fechas__cabecera">
+            <h3 id="titulo-tabla">Movimientos por fecha</h3>
+            <div class="filtro-vista" role="group" aria-label="Qué fechas mostrar">
+              <button type="button" class="boton boton--alternar" data-filtro="desfases" aria-pressed="true">Solo fechas con desfases</button>
+              <button type="button" class="boton boton--alternar" data-filtro="todas" aria-pressed="false">Todas las fechas</button>
+            </div>
+          </div>
+          <div class="filtro-activo" id="filtro-activo"></div>
+          <div class="acciones-tabla">
+            <button type="button" class="boton boton--terciario boton--pequeno" id="boton-desplegar">Desplegar todas</button>
+            <button type="button" class="boton boton--terciario boton--pequeno" id="boton-plegar">Plegar todas</button>
+          </div>
+          <div class="desplazable" role="region" aria-labelledby="titulo-tabla" tabindex="0" id="contenedor-tabla"></div>
+        </section>
+      </section>
+
+      <div class="oculto-visual" id="anuncios" aria-live="polite" aria-atomic="true"></div>
+    </div>
+  </main>
+
+  <dialog class="dialogo" id="dialogo-imprimir" aria-labelledby="titulo-imprimir" aria-describedby="ayuda-imprimir">
+    <h2 id="titulo-imprimir"><span class="icono" data-icono="imprimir" aria-hidden="true"></span>Imprimir</h2>
+    <p id="ayuda-imprimir">Se imprimen el resumen y los movimientos de cada fecha, ya desplegados.</p>
+    <fieldset class="opciones-impresion">
+      <legend>¿Qué quieres imprimir?</legend>
+      <input type="radio" name="impresion" id="impresion-desfases" value="desfases" checked>
+      <label for="impresion-desfases">
+        <strong>Solo desfases</strong>
+        <span>Las fechas con desfases claros o dudosos, y solo esos movimientos.</span>
+      </label>
+      <input type="radio" name="impresion" id="impresion-todo" value="todo">
+      <label for="impresion-todo">
+        <strong>Todo</strong>
+        <span>Todas las fechas, con los desfases y las coincidencias.</span>
+      </label>
+    </fieldset>
+    <div class="dialogo__acciones">
+      <button type="button" class="boton boton--primario" id="boton-confirmar-imprimir">
+        <span class="icono" data-icono="imprimir" aria-hidden="true"></span>Imprimir
+      </button>
+      <button type="button" class="boton boton--terciario" id="boton-cancelar-imprimir">Cancelar</button>
+    </div>
+  </dialog>
+
+  <div class="aviso-version" id="aviso-version" role="status" aria-live="polite"></div>
+
+  <footer class="pie">
+    <div class="contenedor">
+      <p>Esta web funciona como una calculadora: lee los archivos en tu navegador, no los envía a ningún sitio y no guarda nada.
+        Solo recuerda el tamaño de letra y los colores que elijas. Una vez abierta, funciona también sin conexión.</p>
+      <p class="version" id="version"></p>
+    </div>
+  </footer>
+</body>
+</html>

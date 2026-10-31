@@ -1,0 +1,4 @@
+node_modules/
+publicar/
+.claude/
+*.log

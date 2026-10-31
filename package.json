@@ -1,0 +1,17 @@
+{
+  "name": "conciliador-contable",
+  "version": "1.0.0",
+  "description": "Compara los movimientos de la contabilidad con los del extracto del banco, en el navegador.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "ejemplos": "node scripts/generar-ejemplos.mjs",
+    "servir": "node scripts/servidor.mjs",
+    "publicar": "node scripts/preparar-publicacion.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}

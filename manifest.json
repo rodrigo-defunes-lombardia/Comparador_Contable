@@ -1,0 +1,20 @@
+{
+  "id": "./",
+  "name": "Conciliador contable",
+  "short_name": "Conciliador",
+  "description": "Compara los movimientos de la contabilidad con los del extracto del banco. Todo ocurre en tu ordenador.",
+  "lang": "es",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "theme_color": "#0a58a8",
+  "background_color": "#f6f6f3",
+  "categories": ["finance", "productivity"],
+  "icons": [
+    { "src": "img/icono-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "img/icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "img/icono-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "img/icono-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
