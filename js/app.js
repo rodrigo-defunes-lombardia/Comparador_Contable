@@ -71,6 +71,19 @@ function iniciarPreferencias() {
       });
     }
   }
+  const dialogo = $('#dialogo-preferencias');
+  $('#boton-preferencias').addEventListener('click', () => {
+    dialogo.showModal();
+    dialogo.querySelector('input[name="letra"]:checked').focus();
+  });
+  $('#boton-cerrar-preferencias').addEventListener('click', () => dialogo.close());
+  // Pulsar en el fondo, fuera del cuadro, también lo cierra.
+  dialogo.addEventListener('click', (e) => {
+    const r = dialogo.getBoundingClientRect();
+    const fuera = e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+    if (e.target === dialogo && fuera) dialogo.close();
+  });
+  dialogo.addEventListener('close', () => $('#boton-preferencias').focus());
 }
 
 // ---------- Carga de archivos ----------
@@ -94,7 +107,8 @@ function pintarEstadoZona(origen, { tipo, info, mensaje, nombre } = {}) {
     caja.append(el('p', { class: 'zona__mensaje' }, icono('cargando'), `Leyendo «${nombre}»…`));
   } else if (tipo === 'ok') {
     zona.classList.add('zona--ok');
-    accion.textContent = `Cambiar archivo ${origen === 'banco' ? 'del banco' : 'de contabilidad'}`;
+    // El título de la zona ya dice de qué archivo se trata; el resto solo lo oye el lector de pantalla.
+    accion.replaceChildren('Cambiar archivo', ocultoVisual(origen === 'banco' ? ' del banco' : ' de contabilidad'));
     const p = el('p', { class: 'zona__mensaje' }, icono('coincide'),
       el('span', {}, el('strong', { texto: info.nombre }), el('br'), `${textoLeido(info)}.`));
     caja.append(p);
@@ -102,7 +116,7 @@ function pintarEstadoZona(origen, { tipo, info, mensaje, nombre } = {}) {
     if (info.ignoradas > 0) notas.push(`Se han ignorado ${info.ignoradas} ${info.ignoradas === 1 ? 'fila' : 'filas'} sin fecha o sin importe (cabeceras, totales, saldos…).`);
     if (info.hoja) notas.push(`Hoja usada: «${info.hoja}».`);
     if (notas.length) caja.append(el('p', { class: 'zona__nota', texto: notas.join(' ') }));
-    caja.append(el('p', { class: 'zona__nota', texto: 'Comprueba que el número de movimientos y las fechas son los que esperas.' }));
+    caja.append(el('p', { class: 'zona__nota zona__nota--comprobar', texto: 'Comprueba que el número de movimientos y las fechas son los que esperas.' }));
   } else if (tipo === 'error') {
     zona.classList.add('zona--error');
     caja.setAttribute('role', 'alert');
@@ -185,6 +199,10 @@ function reiniciar() {
 function actualizarResultado({ enfocar = false } = {}) {
   const { contabilidad, banco } = estado.archivos;
   $('#boton-reiniciar').hidden = !(contabilidad || banco);
+  // Con los dos archivos leídos, la carga se pliega para que el resultado suba a la vista.
+  const hecha = Boolean(contabilidad && banco);
+  $('.carga').classList.toggle('carga--hecha', hecha);
+  $('#titulo-carga').textContent = hecha ? '1. Archivos comparados' : '1. Elige los dos archivos';
   if (!contabilidad || !banco) {
     estado.resultado = null;
     $('#resultados').hidden = true;
@@ -196,6 +214,7 @@ function actualizarResultado({ enfocar = false } = {}) {
   estado.filtro = 'desfases';
   estado.abiertos.clear();
   $('#ejemplo-aviso').hidden = !estado.esEjemplo;
+  pintarVeredicto();
   pintarTarjetas();
   pintarTabla();
   $('#resultados').hidden = false;
@@ -241,11 +260,6 @@ function pintarTarjetas() {
   const cont = $('#tarjetas');
   cont.replaceChildren();
 
-  const avisos = avisosCarga();
-  if (avisos.length) {
-    cont.append(el('div', { class: 'aviso', role: 'note' }, icono('error'), el('p', { texto: avisos.join(' ') })));
-  }
-
   const tarjeta = (clase, iconoNombre, titulo, cifra, filtro, desglose) => el('section', { class: `tarjeta tarjeta--${clase}`, 'aria-label': titulo },
     botonFiltro(filtro, [
       el('span', { class: 'tarjeta__cabecera' }, icono(iconoNombre), el('span', { class: 'tarjeta__titulo', texto: titulo })),
@@ -255,9 +269,6 @@ function pintarTarjetas() {
     desglose ? el('ul', { class: 'desglose' }, desglose) : null);
 
   cont.append(
-    tarjeta('coincide', 'coincide', 'Coinciden', r.coinciden, 'coincide', [
-      lineaDesglose('desfase_fecha', r.coincidenConDesfase, 'con fecha desfasada 1-2 días'),
-    ]),
     tarjeta('claro', 'claro', 'Desfases claros', r.claros, 'claro', [
       lineaDesglose('falta_banco', r.faltaBanco, 'Falta en el banco'),
       lineaDesglose('falta_contabilidad', r.faltaContabilidad, 'Falta en contabilidad'),
@@ -268,26 +279,63 @@ function pintarTarjetas() {
       lineaDesglose('fecha_muy_distinta', r.fechaMuyDistinta, 'Fecha muy distinta'),
       lineaDesglose('fuera_periodo', r.fueraPeriodo, 'Posible fuera de periodo'),
     ]),
+    tarjeta('coincide', 'coincide', 'Coinciden', r.coinciden, 'coincide', [
+      lineaDesglose('desfase_fecha', r.coincidenConDesfase, 'con fecha desfasada 1-2 días'),
+    ]),
   );
+}
 
+/** Franja con la respuesta principal: si cuadra, cuánto falta y dónde empezar a mirar. */
+function pintarVeredicto() {
+  const r = estado.resumen;
+  const cont = $('#veredicto');
+  cont.replaceChildren();
+
+  const avisos = avisosCarga();
+  if (avisos.length) {
+    cont.append(el('div', { class: 'aviso', role: 'note' }, icono('error'), el('p', { texto: avisos.join(' ') })));
+  }
+
+  const plural = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`;
+  const desfases = r.claros + r.dudosos;
   const cuadra = r.descuadre === 0;
-  cont.append(el('section', { class: `tarjeta tarjeta--dato ${cuadra ? 'tarjeta--cuadra' : 'tarjeta--descuadre'}`, 'aria-label': 'Descuadre total' },
-    el('div', { class: 'tarjeta__cuerpo' },
-      el('span', { class: 'tarjeta__cabecera' }, icono(cuadra ? 'coincide' : 'euro'), el('span', { class: 'tarjeta__titulo', texto: 'Descuadre total' })),
-      el('span', { class: 'tarjeta__cifra tarjeta__cifra--importe', texto: cuadra ? 'Cuadra' : formatearEuros(r.descuadre, { signo: true }) }),
-      el('span', { class: 'tarjeta__nota' },
-        `Neto contabilidad ${formatearEuros(r.netoContabilidad)}`, el('br'), `menos neto banco ${formatearEuros(r.netoBanco)}`))));
+  const textoDesfases = `${plural(r.claros, 'desfase claro', 'desfases claros')} y ${plural(r.dudosos, 'dudoso', 'dudosos')}`;
 
-  const primera = r.primeraFecha;
-  cont.append(el('section', { class: 'tarjeta tarjeta--dato', 'aria-label': 'Primera fecha con descuadre' },
-    primera === null
-      ? el('div', { class: 'tarjeta__cuerpo' },
-        el('span', { class: 'tarjeta__cabecera' }, icono('calendario'), el('span', { class: 'tarjeta__titulo', texto: 'Primera fecha con descuadre' })),
-        el('span', { class: 'tarjeta__cifra tarjeta__cifra--importe', texto: 'Ninguna' }))
-      : el('button', { type: 'button', class: 'tarjeta__principal', onclick: () => irAFecha(primera) },
-        el('span', { class: 'tarjeta__cabecera' }, icono('calendario'), el('span', { class: 'tarjeta__titulo', texto: 'Primera fecha con descuadre' })),
-        el('span', { class: 'tarjeta__cifra tarjeta__cifra--importe', texto: formatearFecha(primera) }),
-        el('span', { class: 'tarjeta__ver', texto: 'Ir a esa fecha' }))));
+  let tipo, titulo, cifra = null, explicacion;
+  if (cuadra && desfases === 0) {
+    tipo = 'cuadra';
+    titulo = 'Cuadra';
+    explicacion = `Todos los movimientos coinciden. Neto de los dos archivos: ${formatearEuros(r.netoContabilidad)}.`;
+  } else if (cuadra) {
+    tipo = 'dudoso';
+    titulo = 'Los totales cuadran, pero hay desfases';
+    explicacion = `Hay ${textoDesfases} que se compensan entre sí. Conviene revisarlos.`;
+  } else {
+    tipo = 'descuadre';
+    titulo = 'No cuadra';
+    cifra = formatearEuros(r.descuadre, { signo: true });
+    explicacion = `La contabilidad suma ${formatearEuros(Math.abs(r.descuadre))} ${r.descuadre < 0 ? 'menos' : 'más'} que el banco `
+      + `(${formatearEuros(r.netoContabilidad)} frente a ${formatearEuros(r.netoBanco)}). Hay ${textoDesfases}.`;
+  }
+
+  const acciones = desfases === 0 ? null : el('div', { class: 'veredicto__acciones' },
+    el('button', { type: 'button', class: 'boton boton--primario', onclick: verDesfases }, 'Ver los desfases'),
+    r.primeraFecha === null ? null
+      : el('button', { type: 'button', class: 'boton boton--secundario', onclick: () => irAFecha(r.primeraFecha) },
+        icono('calendario'), `Ir al primero: ${formatearFecha(r.primeraFecha)}`));
+
+  cont.append(el('section', { class: `veredicto__caja veredicto--${tipo}`, 'aria-labelledby': 'titulo-veredicto' },
+    el('h3', { class: 'veredicto__titulo', id: 'titulo-veredicto' }, icono(tipo === 'cuadra' ? 'coincide' : tipo === 'dudoso' ? 'dudoso' : 'claro'), titulo),
+    cifra ? el('p', { class: 'veredicto__cifra' }, el('span', { class: 'oculto-visual', texto: 'Descuadre total: ' }), cifra) : null,
+    el('p', { class: 'veredicto__texto', texto: explicacion }),
+    acciones));
+}
+
+function verDesfases() {
+  aplicarFiltro('desfases');
+  const titulo = $('#titulo-tabla');
+  titulo.scrollIntoView({ block: 'start', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  titulo.focus({ preventScroll: true });
 }
 
 function actualizarBotonesFiltro() {
@@ -357,20 +405,14 @@ function pintarTabla() {
 
   const tabla = el('table', { class: 'tabla' },
     el('caption', { class: 'oculto-visual', texto: `Movimientos por fecha. ${FILTROS[estado.filtro].nombre}. Pulsa en una fecha para ver sus movimientos.` }),
-    el('colgroup', {}, el('col', {})),
-    el('colgroup', { span: 3, class: 'grupo-contabilidad' }),
-    el('colgroup', { span: 3, class: 'grupo-banco' }),
-    el('colgroup', { span: 3 }),
     el('thead', {},
       el('tr', {},
-        el('th', { scope: 'col', rowspan: 2, texto: 'Fecha' }),
-        el('th', { scope: 'colgroup', colspan: 3, class: 'grupo', texto: 'Contabilidad' }),
-        el('th', { scope: 'colgroup', colspan: 3, class: 'grupo', texto: 'Banco' }),
-        el('th', { scope: 'col', rowspan: 2, class: 'num', texto: 'Diferencia del día' }),
-        el('th', { scope: 'col', rowspan: 2, class: 'num', texto: 'Descuadre acumulado' }),
-        el('th', { scope: 'col', rowspan: 2, texto: 'Estado' })),
-      el('tr', {},
-        ...['Entradas', 'Salidas', 'Neto', 'Entradas', 'Salidas', 'Neto'].map((t) => el('th', { scope: 'col', class: 'num', texto: t })))));
+        el('th', { scope: 'col', texto: 'Fecha' }),
+        el('th', { scope: 'col', texto: 'Estado' }),
+        el('th', { scope: 'col', class: 'num', texto: 'Neto contabilidad' }),
+        el('th', { scope: 'col', class: 'num', texto: 'Neto banco' }),
+        el('th', { scope: 'col', class: 'num', texto: 'Diferencia del día' }),
+        el('th', { scope: 'col', class: 'num', texto: 'Descuadre acumulado' }))));
 
   for (const f of filas) tabla.append(cuerpoFecha(f));
   cont.replaceChildren(tabla);
@@ -385,21 +427,18 @@ function cuerpoFecha(f) {
     onclick: () => alternarFecha(f, boton, detalle),
   }, icono('flecha'), el('span', { texto: formatearFecha(f.dia) }), ocultoVisual(`, ${f.partidas.length} ${f.partidas.length === 1 ? 'movimiento' : 'movimientos'}`));
 
-  const lado = (t, nombre) => [
-    celdaImporte(t.entradas, `${nombre}: entradas`, { vacio: t.n === 0 }),
-    celdaImporte(t.salidas, `${nombre}: salidas`, { vacio: t.n === 0 }),
-    celdaImporte(t.neto, `${nombre}: neto`, { vacio: t.n === 0 }),
-  ];
+  // Las entradas y salidas de cada lado se ven en el detalle de la fecha y en el Excel exportado.
+  const neto = (t, nombre) => celdaImporte(t.neto, `Neto ${nombre}`, { signo: true, vacio: t.n === 0 });
 
   const fila = el('tr', { class: `fila-fecha fila-fecha--${f.tipo}` },
     el('th', { scope: 'row' }, boton),
-    ...lado(f.contabilidad, 'Contabilidad'),
-    ...lado(f.banco, 'Banco'),
+    el('td', { class: 'celda-estado', 'data-etiqueta': 'Estado' }, insignia(f.tipo, f.peor && f.peor.motivo, estadoFecha(f))),
+    neto(f.contabilidad, 'contabilidad'),
+    neto(f.banco, 'banco'),
     celdaImporte(f.diferencia, 'Diferencia del día', { signo: true }),
-    celdaImporte(f.acumulado, 'Descuadre acumulado', { signo: true }),
-    el('td', { 'data-etiqueta': 'Estado' }, insignia(f.tipo, f.peor && f.peor.motivo, estadoFecha(f))));
+    celdaImporte(f.acumulado, 'Descuadre acumulado', { signo: true }));
 
-  const celdaDetalle = el('td', { colspan: 10 });
+  const celdaDetalle = el('td', { colspan: 6 });
   const detalle = el('tr', { class: 'fila-detalle', id: idDetalle, hidden: !abierto }, celdaDetalle);
   if (abierto) celdaDetalle.append(detalleFecha(f));
   return el('tbody', {}, fila, detalle);

@@ -19,6 +19,7 @@ const TRAZOS = {
   euro: '<circle cx="12" cy="12" r="9.5"/><path d="M15.5 8.5a4.5 4.5 0 1 0 0 7M7 11h6M7 13.5h6"/>',
   calendario: '<rect x="4" y="5.5" width="16" height="15" rx="1.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/>',
   error: '<path d="M12 3.5l9.5 16.5h-19z"/><path d="M12 10v4.5M12 17.2v.1"/>',
+  letra: '<path d="M3 19l5-14 5 14M5.2 13.5h5.6"/><path d="M14 19l3.5-9 3.5 9M15.2 16h4.6"/>',
   cargando: '<path d="M12 3.5a8.5 8.5 0 1 1-8.5 8.5"/>',
 };
 

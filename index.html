@@ -36,40 +36,51 @@
         </div>
       </div>
 
-      <div class="preferencias" role="group" aria-label="Preferencias de visualización">
-        <fieldset class="segmentado">
-          <legend>Tamaño de letra</legend>
-          <div class="segmentado__opciones">
-            <input type="radio" name="letra" id="letra-normal" value="normal" checked>
-            <label for="letra-normal">Normal</label>
-            <input type="radio" name="letra" id="letra-grande" value="grande">
-            <label for="letra-grande" class="letra-grande">Grande</label>
-            <input type="radio" name="letra" id="letra-muy-grande" value="muy-grande">
-            <label for="letra-muy-grande" class="letra-muy-grande">Muy grande</label>
-          </div>
-        </fieldset>
-        <fieldset class="segmentado">
-          <legend>Colores</legend>
-          <div class="segmentado__opciones">
-            <input type="radio" name="tema" id="tema-auto" value="auto" checked>
-            <label for="tema-auto">Automático</label>
-            <input type="radio" name="tema" id="tema-claro" value="claro">
-            <label for="tema-claro">Claro</label>
-            <input type="radio" name="tema" id="tema-oscuro" value="oscuro">
-            <label for="tema-oscuro">Oscuro</label>
-            <input type="radio" name="tema" id="tema-contraste" value="contraste">
-            <label for="tema-contraste">Alto contraste</label>
-          </div>
-        </fieldset>
-      </div>
+      <button type="button" class="boton boton--terciario boton--pequeno" id="boton-preferencias" aria-haspopup="dialog">
+        <span class="icono" data-icono="letra" aria-hidden="true"></span>Letra y colores
+      </button>
     </div>
   </header>
+
+  <dialog class="dialogo" id="dialogo-preferencias" aria-labelledby="titulo-preferencias">
+    <h2 id="titulo-preferencias"><span class="icono" data-icono="letra" aria-hidden="true"></span>Letra y colores</h2>
+    <p>Los cambios se aplican al momento y se recuerdan para la próxima vez.</p>
+    <div class="preferencias">
+      <fieldset class="segmentado">
+        <legend>Tamaño de letra</legend>
+        <div class="segmentado__opciones">
+          <input type="radio" name="letra" id="letra-normal" value="normal" checked>
+          <label for="letra-normal">Normal</label>
+          <input type="radio" name="letra" id="letra-grande" value="grande">
+          <label for="letra-grande" class="letra-grande">Grande</label>
+          <input type="radio" name="letra" id="letra-muy-grande" value="muy-grande">
+          <label for="letra-muy-grande" class="letra-muy-grande">Muy grande</label>
+        </div>
+      </fieldset>
+      <fieldset class="segmentado">
+        <legend>Colores</legend>
+        <div class="segmentado__opciones">
+          <input type="radio" name="tema" id="tema-auto" value="auto" checked>
+          <label for="tema-auto">Automático</label>
+          <input type="radio" name="tema" id="tema-claro" value="claro">
+          <label for="tema-claro">Claro</label>
+          <input type="radio" name="tema" id="tema-oscuro" value="oscuro">
+          <label for="tema-oscuro">Oscuro</label>
+          <input type="radio" name="tema" id="tema-contraste" value="contraste">
+          <label for="tema-contraste">Alto contraste</label>
+        </div>
+      </fieldset>
+    </div>
+    <div class="dialogo__acciones">
+      <button type="button" class="boton boton--primario" id="boton-cerrar-preferencias">Listo</button>
+    </div>
+  </dialog>
 
   <main id="contenido" tabindex="-1">
     <div class="contenedor">
       <section class="carga" aria-labelledby="titulo-carga">
         <h2 id="titulo-carga">1. Elige los dos archivos</h2>
-        <p class="ayuda">Exporta un Excel de tu aplicación de contabilidad y otro del banco, del mismo periodo.
+        <p class="ayuda carga__ayuda">Exporta un Excel de tu aplicación de contabilidad y otro del banco, del mismo periodo.
           Cada archivo debe tener 4 columnas en este orden: <strong>fecha, concepto, entradas y salidas</strong>.
           Se aceptan archivos .xlsx, .xls y .csv.</p>
 
@@ -124,11 +135,13 @@
         <p class="solo-impresion" id="cabecera-impresion"></p>
         <p class="ayuda" id="ejemplo-aviso" hidden><span class="icono" data-icono="info" aria-hidden="true"></span>Estás viendo <strong>datos de ejemplo ficticios</strong>. Para comparar los tuyos, pulsa «Empezar de nuevo».</p>
 
+        <div class="veredicto" id="veredicto"></div>
+
         <div class="tarjetas" id="tarjetas"></div>
 
         <section class="tabla-fechas" aria-labelledby="titulo-tabla">
           <div class="tabla-fechas__cabecera">
-            <h3 id="titulo-tabla">Movimientos por fecha</h3>
+            <h3 id="titulo-tabla" tabindex="-1">Movimientos por fecha</h3>
             <div class="filtro-vista" role="group" aria-label="Qué fechas mostrar">
               <button type="button" class="boton boton--alternar" data-filtro="desfases" aria-pressed="true">Solo fechas con desfases</button>
               <button type="button" class="boton boton--alternar" data-filtro="todas" aria-pressed="false">Todas las fechas</button>

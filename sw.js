@@ -6,7 +6,7 @@
 // "v-", en "version" de package.json. Si añades o renombras archivos de la web,
 // actualiza también ARCHIVOS (los tests comprueban que la lista está completa).
 
-const CACHE_VERSION = 'v-1.0.0';
+const CACHE_VERSION = 'v-1.1.0';
 const PREFIJO = 'comparador-';
 const CACHE = `${PREFIJO}${CACHE_VERSION}`;
 
