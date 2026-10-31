@@ -1,6 +1,6 @@
 {
   "name": "comparador-contable",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Compara los movimientos de la contabilidad con los del extracto del banco, en el navegador.",
   "private": true,
   "type": "module",

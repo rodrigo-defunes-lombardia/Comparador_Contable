@@ -19,6 +19,8 @@ createServer(async (req, res) => {
     const ruta = decodeURIComponent(new URL(req.url, 'http://x').pathname);
     let archivo = normalize(join(RAIZ, ruta));
     if (!archivo.startsWith(RAIZ)) { res.writeHead(403).end(); return; }
+    // Como Cloudflare Pages: ".../index.html" redirige a ".../", para probar en local lo mismo que en la web.
+    if (ruta.endsWith('/index.html')) { res.writeHead(308, { Location: ruta.slice(0, -'index.html'.length) }).end(); return; }
     if ((await stat(archivo).catch(() => null))?.isDirectory()) archivo = join(archivo, 'index.html');
     const datos = await readFile(archivo);
     res.writeHead(200, { 'Content-Type': TIPOS[extname(archivo).toLowerCase()] || 'application/octet-stream', 'Cache-Control': 'no-store' });

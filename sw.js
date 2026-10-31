@@ -6,7 +6,7 @@
 // "v-", en "version" de package.json. Si añades o renombras archivos de la web,
 // actualiza también ARCHIVOS (los tests comprueban que la lista está completa).
 
-const CACHE_VERSION = 'v-1.1.0';
+const CACHE_VERSION = 'v-1.1.1';
 const PREFIJO = 'comparador-';
 const CACHE = `${PREFIJO}${CACHE_VERSION}`;
 
@@ -38,10 +38,27 @@ const ARCHIVOS = [
   "img/apple-touch-icon.png"
 ];
 
+/**
+ * Copia sin la marca de "redirigida". Cloudflare Pages redirige index.html a "/" (308), y el
+ * navegador rechaza una respuesta redirigida al abrir la página: la web no cargaría ni una vez.
+ */
+async function sinRedireccion(respuesta) {
+  if (!respuesta.redirected) return respuesta;
+  return new Response(await respuesta.blob(), {
+    status: respuesta.status, statusText: respuesta.statusText, headers: respuesta.headers,
+  });
+}
+
 self.addEventListener('install', (evento) => {
-  // cache: 'reload' evita copiar archivos antiguos de la caché HTTP del navegador.
-  evento.waitUntil(caches.open(CACHE).then((cache) =>
-    cache.addAll(ARCHIVOS.map((ruta) => new Request(ruta, { cache: 'reload' })))));
+  evento.waitUntil((async () => {
+    const cache = await caches.open(CACHE);
+    await Promise.all(ARCHIVOS.map(async (ruta) => {
+      // cache: 'reload' evita copiar archivos antiguos de la caché HTTP del navegador.
+      const respuesta = await fetch(new Request(ruta, { cache: 'reload' }));
+      if (!respuesta.ok) throw new Error(`No se ha podido guardar ${ruta} (${respuesta.status})`);
+      await cache.put(ruta, await sinRedireccion(respuesta));
+    }));
+  })());
   // No se activa sola: espera a que la usuaria pulse "Actualizar" (mensaje ACTUALIZAR).
 });
 
