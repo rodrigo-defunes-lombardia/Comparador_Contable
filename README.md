@@ -232,8 +232,13 @@ Los nombres de los menús de Cloudflare cambian de vez en cuando; si no encuentr
 1. Haz los cambios y comprueba que los tests pasan (`npm test`).
 2. Si has añadido, quitado o renombrado archivos de la web, actualiza la lista `ARCHIVOS` de [`sw.js`](sw.js)
    (los tests avisan si falta alguno). Esa lista decide también qué se publica.
-3. **Cambia `CACHE_VERSION`** al principio de [`sw.js`](sw.js), por ejemplo de `'2026-10-31.1'` a
-   `'2026-11-15.1'`. Sin este cambio, quien ya tenga la web instalada seguirá viendo la versión anterior,
+3. **Sube `CACHE_VERSION`** al principio de [`sw.js`](sw.js), con el formato `v-X.X.X`, y pon el mismo
+   número (sin `v-`) en `version` de [`package.json`](package.json); los tests comprueban que coinciden:
+   - `v-1.0.1` para correcciones pequeñas,
+   - `v-1.1.0` para mejoras o funciones nuevas,
+   - `v-2.0.0` para cambios grandes.
+
+   Sin este cambio, quien ya tenga la web instalada seguirá viendo la versión anterior,
    porque se sirve desde la caché.
 4. Opción A: sube los cambios a la rama `main`. Opción B: vuelve a subir la carpeta `publicar/`.
    La próxima vez que se abra la web con conexión aparecerá el aviso «Hay una versión nueva. Actualizar».

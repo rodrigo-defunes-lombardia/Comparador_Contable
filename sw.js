@@ -2,10 +2,11 @@
 // Estrategia: caché primero. Los archivos de Excel del usuario nunca pasan por aquí
 // (se leen en el navegador y no se piden a ninguna red).
 //
-// PARA PUBLICAR UNA VERSIÓN NUEVA: cambia CACHE_VERSION. Si añades o renombras archivos de la web,
+// PARA PUBLICAR UNA VERSIÓN NUEVA: sube CACHE_VERSION (formato v-X.X.X) y pon el mismo número, sin
+// "v-", en "version" de package.json. Si añades o renombras archivos de la web,
 // actualiza también ARCHIVOS (los tests comprueban que la lista está completa).
 
-const CACHE_VERSION = '2026-10-31.1';
+const CACHE_VERSION = 'v-1.0.0';
 const PREFIJO = 'comparador-';
 const CACHE = `${PREFIJO}${CACHE_VERSION}`;
 

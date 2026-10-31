@@ -106,7 +106,7 @@ async function registrarServiceWorker(hayTrabajo) {
   if (!('serviceWorker' in navigator) || !window.isSecureContext) return;
 
   navigator.serviceWorker.addEventListener('message', (e) => {
-    if (e.data && e.data.version) $('#version').textContent = `Versión ${e.data.version}`;
+    if (e.data && e.data.version) $('#version').textContent = `Versión: ${e.data.version}`;
   });
 
   let recargando = false;

@@ -11,8 +11,10 @@ function archivosPrecache() {
   return JSON.parse(m[1]);
 }
 
-test('service worker: tiene versión de caché explícita', () => {
-  assert.match(leer('sw.js'), /const CACHE_VERSION = '[^']+';/);
+test('service worker: versión de caché con formato v-X.X.X, igual que package.json', () => {
+  const m = /const CACHE_VERSION = 'v-(\d+\.\d+\.\d+)';/.exec(leer('sw.js'));
+  assert.ok(m, "CACHE_VERSION debe tener el formato 'v-X.X.X'");
+  assert.equal(JSON.parse(leer('package.json')).version, m[1], 'la versión de package.json debe coincidir');
 });
 
 test('service worker: todos los archivos de la lista existen', () => {
