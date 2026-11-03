@@ -111,7 +111,7 @@ async function registrarServiceWorker(hayTrabajo) {
 
   let recargando = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    // Solo se recarga si la usuaria pulsó "Actualizar" (no en la primera instalación).
+    // Solo se recarga si se pulsó "Actualizar" (no en la primera instalación).
     if (recargando || !sessionStorageSeguro('comparador-actualizando')) { pedirVersion(); return; }
     recargando = true;
     sessionStorageSeguro('comparador-actualizando', null);

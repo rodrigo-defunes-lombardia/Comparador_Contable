@@ -59,7 +59,7 @@ self.addEventListener('install', (evento) => {
       await cache.put(ruta, await sinRedireccion(respuesta));
     }));
   })());
-  // No se activa sola: espera a que la usuaria pulse "Actualizar" (mensaje ACTUALIZAR).
+  // No se activa sola: espera a que se pulse "Actualizar" (mensaje ACTUALIZAR).
 });
 
 self.addEventListener('activate', (evento) => {

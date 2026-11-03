@@ -1,254 +1,249 @@
 # Comparador contable
 
-Web sencilla para comprobar que los movimientos de la aplicación de contabilidad coinciden con los del
-extracto del banco. Se eligen los dos Excel del mes y la web dice qué coincide, qué falta y qué hay que revisar.
+**Comprueba en un minuto si tu contabilidad cuadra con el banco.**
 
-- **Privada**: todo ocurre en el navegador. Los archivos no se envían a ningún sitio, no hay servidor,
-  ni cuentas, ni analíticas. La página tiene una Content-Security-Policy que bloquea cualquier conexión externa.
-- **No guarda nada**: solo recuerda el tamaño de letra y los colores elegidos (en `localStorage`).
-- **Accesible**: 3 tamaños de letra, modo claro, oscuro y alto contraste, todo manejable con teclado.
-- **Instalable y sin conexión**: se puede instalar como aplicación y, una vez abierta, funciona sin Internet.
+Eliges el Excel que exporta tu programa de contabilidad y el extracto que descargas del banco, y la web te
+dice qué movimientos coinciden, cuáles faltan en un lado o en otro y cuáles conviene revisar. Sin instalar
+nada, sin crear cuentas y sin que tus datos salgan de tu ordenador.
 
-## Cómo usarla
+<!-- Cuando la web esté publicada, añade aquí el enlace: **[Pruébala aquí](https://…)** -->
 
-1. Exporta el Excel de la aplicación de contabilidad y el del banco, del mismo periodo.
-   Cada uno debe tener 4 columnas en este orden: **fecha, concepto, entradas, salidas**
-   (se aceptan `.xlsx`, `.xls` y `.csv`; da igual que haya títulos, filas vacías o totales).
-2. Abre la web y arrastra cada archivo a su zona (o pulsa «Elegir archivo…»).
-3. Comprueba el mensaje «N movimientos leídos, del … al …» de cada archivo.
-4. Revisa las tarjetas de resumen y la tabla por fecha. Pulsa una fecha para ver sus movimientos lado a lado.
-5. Si quieres guardarlo, pulsa **Exportar a Excel**.
+![Resumen de una comparación con los datos de ejemplo: tarjetas de movimientos que coinciden, desfases claros, desfases dudosos, descuadre total y primera fecha con descuadre](docs/captura-resumen.jpg)
 
-Para probarla sin archivos propios, pulsa **Probar con datos de ejemplo**, o usa los dos Excel de la carpeta
-[`ejemplos/`](ejemplos/).
+## El problema
 
-## Instalarla como aplicación
+Quien lleva sus propias cuentas suele apuntar los cobros y pagos en un programa de contabilidad y, cada
+mes, comprobar que coinciden con lo que dice el banco. Hecho a mano consiste en poner los dos listados uno
+junto a otro e ir tachando, día por día, cientos de movimientos. Es lento, aburrido y fácil equivocarse:
 
-La web se puede instalar como una aplicación más del ordenador (con su propio icono y ventana). Una vez
-instalada, o simplemente abierta una vez, **funciona sin conexión**: la web completa, incluida la librería
-de Excel, queda guardada en el ordenador. Los archivos de Excel siguen sin salir del ordenador.
+- el banco carga un recibo un par de días después de cuando se apuntó,
+- el concepto no se parece («Iberdrola luz» frente a «RECIBO IBERDROLA CLIENTES SAU»),
+- un importe se tecleó mal, o un movimiento se quedó sin apuntar,
+- y al final del mes algunos movimientos caen en el extracto del mes siguiente.
 
-- **Chrome**: pulsa el botón **Instalar la aplicación** de la cabecera, o el icono de instalar ⊕ que aparece
-  a la derecha de la barra de direcciones (también en el menú ⋮ › *Transmitir, guardar y compartir* ›
-  *Instalar página como aplicación*).
-- **Edge**: el botón **Instalar la aplicación**, o el menú ⋯ › *Aplicaciones* › *Instalar este sitio como aplicación*.
-- **Safari (Mac, Safari 17 o superior)**: menú **Archivo › Añadir al Dock**. La web muestra esta nota cuando
-  detecta Safari.
+Comparador contable hace ese cruce automáticamente y deja a la vista solo lo que hay que revisar.
 
-El botón *Instalar la aplicación* solo aparece cuando el navegador permite instalarla y desaparece cuando
-ya está instalada. Para desinstalarla: en Chrome o Edge, abre la aplicación y usa el menú ⋮ › *Desinstalar*;
-en Mac, arrástrala desde el Dock o desde la carpeta Aplicaciones a la papelera.
+## ¿Para quién es?
 
-### Cómo se actualiza
+- **Autónomos y pequeños negocios** que llevan su propia contabilidad o la preparan para la gestoría.
+- **Asociaciones, comunidades de vecinos y clubes** que tienen que cuadrar la caja con la cuenta del banco.
+- **Particulares** que llevan un control de gastos en una hoja de cálculo o en una aplicación.
 
-Cada vez que se abre, la web comprueba (si hay conexión) si hay una versión nueva; si la deja abierta,
-lo comprueba también cada hora. Si la hay, aparece abajo a la derecha el aviso **«Hay una versión nueva.
-Actualizar»**. No interrumpe: se puede seguir trabajando y pulsar *Actualizar* (o *Más tarde*) cuando se
-quiera. Al actualizar se recarga la página, así que hay que volver a elegir los archivos. La versión
-instalada se ve al pie de la página.
+No hace falta saber nada de informática: si sabes exportar un Excel de tu programa y descargar el extracto
+de tu banco, sabes usarla. Está pensada también para personas mayores o con baja visión (ver
+[Accesibilidad](#accesibilidad)).
 
-## Ejecutarla en tu ordenador
+## Qué hace
 
-Es una web estática: no hace falta instalar nada salvo para servirla. Los módulos JavaScript no funcionan
-abriendo `index.html` con doble clic (`file://`), así que hay que usar un servidor local cualquiera:
+- **Lee los dos archivos** tal como salen de cada programa: `.xlsx`, `.xls` o `.csv`, con títulos, filas
+  vacías, totales o saldos alrededor de la tabla.
+- **Empareja los movimientos uno a uno**, tolerando pequeñas diferencias de fecha y conceptos escritos de
+  otra forma (ver [Cómo decide si dos movimientos coinciden](#cómo-decide-si-dos-movimientos-coinciden)).
+- **Resume el resultado**: cuántos movimientos coinciden, qué falta en el banco o en la contabilidad, qué
+  importes no cuadran, el descuadre total en euros y la primera fecha en la que algo no encaja.
+- **Muestra una tabla por días** con el descuadre acumulado; cada día se despliega para ver los movimientos
+  de los dos lados emparejados.
+- **Exporta un informe en Excel** con el resumen, los desfases, la tabla por fecha y las coincidencias.
+- **Imprime** solo los desfases o el informe completo.
+- **Se puede instalar como aplicación** y funciona sin conexión a Internet.
+
+## Privacidad
+
+Los extractos bancarios son datos delicados, así que la web está hecha para no necesitar a nadie más:
+
+- **Todo ocurre en tu navegador.** Los archivos se leen en tu ordenador y nunca se envían a ningún servidor.
+  De hecho, no hay servidor: es una página estática.
+- **No guarda nada.** Al cerrar la pestaña, los datos desaparecen. Solo recuerda el tamaño de letra y los
+  colores que elijas.
+- **Sin cuentas, sin cookies, sin analíticas.**
+- **Bloqueo técnico de conexiones**: la página tiene una política de seguridad (Content-Security-Policy) que
+  impide que su código haga cualquier petición a Internet, incluso aunque alguien intentara colar código.
+
+## Cómo se usa
+
+1. Exporta los movimientos del mes desde tu programa de contabilidad y descarga el extracto del mismo
+   periodo desde tu banco. Cada archivo debe tener cuatro columnas en este orden:
+
+   | Fecha | Concepto | Entradas | Salidas |
+   |---|---|---|---|
+   | 03/03/2026 | Venta mostrador | 120,00 | |
+   | 04/03/2026 | Recibo luz | | 62,40 |
+
+   Las entradas y las salidas van en columnas separadas, ambas en positivo. Da igual que la tabla no empiece
+   en la primera fila o que haya filas de título, totales o saldos: se ignoran solas. Si el banco incluye
+   también la «fecha valor», se usa la fecha contable.
+2. Abre la web y arrastra cada archivo a su recuadro (o pulsa «Elegir archivo…»).
+3. Comprueba el aviso «N movimientos leídos, del … al …» de cada archivo, para asegurarte de que se ha
+   leído lo que esperabas.
+4. Revisa el resultado. Las tarjetas de arriba sirven de filtro; en la tabla, pulsa una fecha para ver
+   sus movimientos.
+5. Si quieres guardarlo o enviarlo a tu gestoría, pulsa **Exportar a Excel** o **Imprimir**.
+
+¿Quieres verla funcionar antes de usar tus datos? Pulsa **Probar con datos de ejemplo**: carga un mes
+completo de movimientos inventados con un caso de cada tipo de desfase. Los mismos datos están en
+[`ejemplos/`](ejemplos/) como archivos Excel.
+
+## Cómo decide si dos movimientos coinciden
+
+Cada movimiento se empareja como mucho con uno del otro archivo. La web aplica estas reglas en orden, de
+la más segura a la más dudosa, y cada una solo trabaja con lo que han dejado libre las anteriores:
+
+| Orden | Importe | Fechas | Concepto | Resultado |
+|---|---|---|---|---|
+| 1 | igual | mismo día | parecido | ✅ **Coincide** |
+| 2 | igual | 1–2 días de diferencia | parecido | ✅ **Coincide**, con aviso de fecha desfasada |
+| 3 | igual | hasta 2 días | distinto | ❓ **Dudoso**: concepto distinto |
+| 4 | distinto | hasta 2 días | parecido | ❌ **Desfase claro**: importe distinto (indica la diferencia) |
+| 5 | igual | de 3 a 31 días | parecido | ❓ **Dudoso**: fecha muy distinta |
+| 6 | — | — | — | ❌ **Desfase claro**: falta en el banco o falta en la contabilidad |
+
+Algunos detalles:
+
+- **Un cobro nunca se empareja con un pago**, aunque sean del mismo importe.
+- **Si hay varios candidatos**, se elige el de fecha más cercana, después el de concepto más parecido y,
+  si aún empatan, el que aparece antes en el archivo. Así el resultado es siempre el mismo.
+- **Conceptos parecidos**: se comparan las palabras ignorando mayúsculas, tildes, números y palabras que
+  aparecen en casi todos los movimientos («recibo», «transferencia», «compra», «tarjeta», los meses…). Se
+  aceptan abreviaturas: «transf.» equivale a «transferencia».
+- **Bordes del mes**: si algo que falta cae en los dos primeros o los dos últimos días del periodo del otro
+  archivo, se marca como dudoso («puede caer fuera del periodo»), porque lo normal es que aparezca en el
+  extracto del mes siguiente.
+- **Pistas**: si a un movimiento que falta le corresponde otro suelto con el mismo importe en el otro
+  archivo, la web lo señala para que lo revises.
+
+Todos los márgenes (2 días, 31 días, el grado de parecido de los conceptos…) se pueden ajustar en
+[`js/config.js`](js/config.js).
+
+## Accesibilidad
+
+- Tres tamaños de letra (normal, grande y muy grande) y todo el diseño se adapta a ellos.
+- Modo claro, oscuro y de alto contraste. Los colores cumplen las pautas WCAG: nivel AA en los modos
+  normales y AAA en el de alto contraste.
+- Ningún estado se indica solo con color: siempre hay un icono y un texto («Falta en el banco», «Importe
+  distinto»…).
+- Se puede usar entera con el teclado, con el foco siempre visible, y es compatible con lectores de
+  pantalla: los resultados se anuncian al terminar la comparación.
+- Botones grandes y fáciles de pulsar, y respeta la opción del sistema de reducir animaciones.
+
+## Instalarla y usarla sin conexión
+
+Comparador contable es una aplicación web instalable (PWA). Después de abrirla una vez, funciona sin
+Internet, y se puede instalar para tenerla en el escritorio o en el Dock como cualquier otro programa:
+
+- **Chrome y Edge**: botón **Instalar la aplicación** de la propia web, o el icono de instalar de la barra de
+  direcciones.
+- **Safari (Mac)**: menú **Archivo › Añadir al Dock**.
+
+Cuando se publica una versión nueva, la web lo avisa con un mensaje («Hay una versión nueva. Actualizar»)
+que no interrumpe: se actualiza cuando tú pulses. La versión instalada aparece al pie de la página.
+
+---
+
+## Para desarrolladores
+
+### Tecnología
+
+- HTML, CSS y JavaScript (módulos ES) sin frameworks ni paso de compilación: el código del repositorio es
+  exactamente lo que se publica.
+- [SheetJS Community Edition](https://sheetjs.com/) 0.20.3 para leer y escribir Excel, incluida en
+  [`vendor/`](vendor/) (licencia Apache 2.0) para no depender de servicios externos y poder funcionar sin
+  conexión.
+- Service worker propio para el modo sin conexión y las actualizaciones.
+- Tests con el ejecutor integrado de Node.js (`node --test`), sin dependencias.
+
+### Ejecutarla en local
+
+Necesitas [Node.js](https://nodejs.org) 18 o superior. Los módulos JavaScript no funcionan abriendo
+`index.html` con doble clic, así que hace falta un servidor local:
 
 ```bash
-node scripts/servidor.mjs
+npm run servir
 ```
 
-y abre <http://localhost:8080>. (Alternativa sin Node: `python -m http.server 8080`.)
-
-Requiere [Node.js](https://nodejs.org) 18 o superior solo para el servidor local, los tests y el generador de ejemplos.
+y abre <http://localhost:8080>. (Sin Node también vale `python -m http.server 8080`.)
 
 ```bash
 npm test
 ```
 
-```bash
-npm run ejemplos
-```
+| Comando | Qué hace |
+|---|---|
+| `npm run servir` | Servidor local en el puerto 8080 |
+| `npm test` | Ejecuta los tests |
+| `npm run ejemplos` | Regenera los Excel ficticios de `ejemplos/` |
+| `npm run publicar` | Prepara en `publicar/` los archivos que se publican |
+| `node scripts/generar-iconos.mjs` | Regenera los iconos de la aplicación |
 
-`npm test` ejecuta los tests automáticos (`node --test`) y `npm run ejemplos` regenera los dos Excel ficticios de `ejemplos/`.
+### Cómo está organizado
 
-## Cómo funciona el emparejado
-
-Cada movimiento se convierte en un importe con signo (entrada = +, salida = −) en **céntimos enteros**,
-así que una entrada de 100 € nunca se empareja con una salida de 100 €. Las fechas se manejan como días
-"planos" (sin hora ni zona horaria) para evitar desfases de un día.
-
-Cada movimiento se empareja **como máximo con uno** del otro archivo. Se aplican estas pasadas en orden; si hay
-varios candidatos se elige el de menor diferencia de días, luego el de concepto más parecido, luego el primero
-en el orden original del archivo:
-
-| Pasada | Importe | Días de diferencia | Concepto | Resultado |
-|---|---|---|---|---|
-| 1 | igual | 0 | parecido | **Coincide** |
-| 2 | igual | 1 a 2 | parecido | **Coincide** («Fecha desfasada N días») |
-| 3 | igual | 0 a 2 | distinto | **Dudoso**: concepto distinto |
-| 4 | distinto, mismo signo | 0 a 2 | parecido | **Claro**: importe distinto (se muestra la diferencia) |
-| 5 | igual | 3 a 31 | parecido | **Dudoso**: fecha muy distinta |
-| 6 | lo que sobra | | | **Claro**: falta en el banco / falta en contabilidad |
-
-En la pasada 6, si el movimiento cae a menos de 2 días del principio o del final del periodo del otro archivo
-(o fuera de él), se marca como **Dudoso: puede caer fuera del periodo**. Si en el otro archivo queda un
-movimiento sin emparejar con el mismo importe, se muestra como pista.
-
-**Concepto parecido**: se pasa a minúsculas, se quitan tildes, números y signos de puntuación, y se comparan
-las palabras. El parecido es la proporción de palabras del concepto más corto que aparecen en el otro
-(se acepta una abreviatura de 4 letras o más, como «transf» → «transferencia»). Se ignoran palabras vacías
-(«de», «la»…) y palabras genéricas de banca («recibo», «transferencia», «compra», «tarjeta», meses…), salvo que
-un concepto se quede sin palabras. Es parecido si llega al umbral (0,5 por defecto).
-
-**Descuadre total** = neto de contabilidad − neto del banco. **Primera fecha con descuadre** = la primera fecha
-con algún movimiento en desfase claro o dudoso.
-
-## Constantes configurables
-
-Están todas en [`js/config.js`](js/config.js):
-
-| Constante | Valor | Para qué sirve |
-|---|---|---|
-| `MARGEN_DIAS` | 2 | Días de diferencia admitidos para «mismo momento» y margen de los bordes del periodo |
-| `VENTANA_MAX_DIAS` | 31 | Máximo de días para la pasada «fecha muy distinta» |
-| `UMBRAL_CONCEPTO` | 0,5 | Parecido mínimo de concepto (0 a 1) |
-| `LONGITUD_MIN_PALABRA` | 2 | Palabras más cortas no cuentan |
-| `LONGITUD_MIN_PREFIJO` | 4 | Longitud mínima para aceptar abreviaturas (0 = desactivado) |
-| `PALABRAS_VACIAS` | … | Palabras que nunca cuentan |
-| `PALABRAS_GENERICAS` | … | Palabras de banca que se ignoran si hay otras |
-| `ANIO_MIN`, `ANIO_MAX` | 1990, 2100 | Años válidos (evita tomar importes por fechas) |
-| `MAX_FILAS`, `MAX_BYTES` | 100 000, 30 MB | Límites de seguridad de lectura |
-
-## Lectura de archivos
-
-- Un único lector para los dos archivos ([`js/lector.js`](js/lector.js) y [`js/filas.js`](js/filas.js)).
-- La columna de fecha se detecta sola (la primera columna con fechas); la tabla no tiene que empezar en la
-  fila 1 ni en la columna A. Si justo detrás hay otra columna de fechas (fecha valor), se salta: se usa la fecha contable.
-- Fechas: número de serie de Excel (también libros con sistema 1904), objetos fecha y texto `dd/mm/aaaa`
-  (también `dd-mm-aa`, `dd.mm.aaaa` y `aaaa-mm-dd`).
-- Importes: números, celdas vacías y texto español (`1.234,56`, `-12,30 €`, `(45,00)`). Un texto como `1.234`
-  se interpreta como mil doscientos treinta y cuatro.
-- Se ignora toda fila sin fecha válida, las filas sin importe y las filas de saldo o total aunque tengan fecha.
-- Si el libro tiene varias hojas, se usa la que más movimientos tenga.
-- CSV: separador `;`, `,` o tabulador detectado automáticamente; codificación UTF-8 o Windows-1252.
-
-## Estructura
+La lógica no depende de la interfaz: cada módulo recibe datos y devuelve datos, y por eso se puede probar
+en Node sin navegador.
 
 ```
-index.html                 Página única
-css/estilos.css            Estilos (temas, tamaños de letra, impresión)
-js/config.js               Constantes configurables
-js/valores.js              Fechas, importes y formato
-js/filas.js                Filas de una hoja → movimientos
-js/lector.js               Lectura de .xlsx/.xls/.csv
-js/concepto.js             Parecido de conceptos
-js/emparejado.js           Algoritmo de emparejado
-js/resumen.js              Resumen, tabla por fecha, filtros y etiquetas
-js/exportar.js             Exportación a Excel
-js/app.js                  Interfaz
-js/pwa.js                  Instalación, service worker y aviso de versión nueva
-sw.js                      Service worker (caché sin conexión, CACHE_VERSION)
-manifest.json              Manifest de la aplicación instalable
-img/                       Iconos (generados con scripts/generar-iconos.mjs)
-js/ejemplo.js              Generador de datos ficticios
-vendor/sheetjs/            SheetJS Community Edition 0.20.3 (licencia Apache 2.0), incluido en el repositorio
-scripts/                   Servidor local, generadores de ejemplos e iconos, y preparación de la publicación
-tests/                     Tests automáticos (node --test)
-ejemplos/                  Dos Excel ficticios para probar
+Archivo Excel/CSV
+  → js/lector.js      bytes → celdas (SheetJS para Excel, lector propio para CSV)
+  → js/filas.js       celdas → movimientos {día, concepto, importe en céntimos}
+  → js/emparejado.js  dos listas de movimientos → pares y sueltos, con su estado
+  → js/resumen.js     resultado → tarjetas, tabla por fecha, filtros y textos
+  → js/app.js         interfaz          → js/exportar.js  informe en Excel
 ```
 
-Preparado para ampliar: `conciliar()` ya acepta `paresManuales` (emparejado manual) y parámetros propios,
-y toda la lógica es independiente de la interfaz (para añadir historial o varias cuentas más adelante).
+| Ruta | Contenido |
+|---|---|
+| [`index.html`](index.html), [`css/estilos.css`](css/estilos.css) | Página y estilos (temas, tamaños de letra, impresión) |
+| [`js/config.js`](js/config.js) | Márgenes y umbrales configurables |
+| [`js/valores.js`](js/valores.js) | Fechas, importes y formatos |
+| [`js/concepto.js`](js/concepto.js) | Parecido entre conceptos |
+| [`js/pwa.js`](js/pwa.js), [`sw.js`](sw.js), [`manifest.json`](manifest.json) | Aplicación instalable y modo sin conexión |
+| [`js/ejemplo.js`](js/ejemplo.js) | Generador de los datos ficticios |
+| [`scripts/`](scripts/) | Servidor local y generadores (ejemplos, iconos, publicación) |
+| [`tests/`](tests/) | Tests automáticos |
 
-## Aplicación instalable (PWA)
+Algunas decisiones de diseño:
 
-- [`manifest.json`](manifest.json): nombre, idioma, colores e iconos. `start_url` y `scope` son relativos
-  (`./`), así que funciona tanto en la raíz de un dominio como en una subruta.
-- [`sw.js`](sw.js): service worker. Precachea toda la web (lista `ARCHIVOS`) con la estrategia *caché primero*,
-  borra las cachés antiguas al activarse y sirve la página principal en cualquier navegación sin conexión.
-  La versión nueva no se activa sola: espera a que se pulse *Actualizar*.
-- [`js/pwa.js`](js/pwa.js): registro del service worker, aviso de versión nueva y botón de instalar.
-- Los iconos (`img/icono-192.png`, `img/icono-512.png`, `img/icono-maskable-*.png` y
-  `img/apple-touch-icon.png`) se generan con `node scripts/generar-iconos.mjs`, sin dependencias.
+- **Importes en céntimos enteros** para evitar errores de redondeo de la coma flotante.
+- **Fechas como días enteros sin hora ni zona horaria**, para que ningún movimiento cambie de día.
+- **Emparejado por pasadas** con desempate determinista, en lugar de buscar el emparejamiento óptimo global:
+  es más rápido y, sobre todo, cada resultado se puede explicar. Los movimientos se indexan por importe y
+  por día, de modo que 5.000 contra 5.000 se comparan en menos de un segundo.
+- **Nunca se inserta texto de los archivos como HTML**, para que un Excel malicioso no pueda ejecutar código.
 
-## Publicar en Cloudflare Pages
+### Publicarla
 
-La web se publica gratis en Cloudflare Pages, con una dirección corta del tipo
-`https://<nombre-del-proyecto>.pages.dev` (el nombre lo eliges tú al crear el proyecto) y HTTPS, que es
-obligatorio para poder instalarla y usarla sin conexión.
+Es una web estática; se puede alojar en cualquier servicio de páginas estáticas con HTTPS (necesario para
+el modo sin conexión). Está preparada para **Cloudflare Pages**:
 
-Solo se publica lo necesario: `node scripts/preparar-publicacion.mjs` (o `npm run publicar`) crea la carpeta
-`publicar/` con los archivos de la web (la misma lista `ARCHIVOS` de `sw.js`) y un archivo `_headers` con
-cabeceras de seguridad (la misma Content-Security-Policy de `index.html`, más `frame-ancestors 'none'` para que
-nadie pueda incrustar la web). Los tests, los scripts, el README y los Excel de ejemplo no se publican.
+1. Conecta el repositorio en *Workers & Pages › Create application › Pages › Connect to Git*.
+2. Configuración: preset `None`, comando de compilación `node scripts/preparar-publicacion.mjs` y
+   carpeta de salida `publicar`.
 
-> **Elige bien el nombre del proyecto antes de que nadie instale la aplicación.** Si la dirección cambia
-> después, el navegador la trata como otra aplicación y hay que volver a instalarla.
+El script copia solo los archivos de la web (no los tests ni los ejemplos) y genera `_headers` con las
+cabeceras de seguridad. Si Cloudflare crea un *Worker* en lugar de un proyecto de *Pages*, también funciona
+con el comando de despliegue `npx wrangler deploy`, gracias a [`wrangler.jsonc`](wrangler.jsonc).
 
-### Opción A (recomendada): conectada a un repositorio de GitHub
+### Publicar una versión nueva
 
-Cada vez que subas cambios a GitHub, Cloudflare publica la versión nueva sola. El repositorio puede ser privado.
+1. Haz los cambios y comprueba que los tests pasan.
+2. Si añades o renombras archivos de la web, actualiza la lista `ARCHIVOS` de [`sw.js`](sw.js) (un test
+   avisa si falta alguno).
+3. Sube la versión en `CACHE_VERSION` de [`sw.js`](sw.js) y en `version` de
+   [`package.json`](package.json), con el formato `v-X.X.X` (`v-1.0.1` para correcciones, `v-1.1.0` para
+   mejoras, `v-2.0.0` para cambios grandes). Sin este paso, quien ya la tenga instalada seguiría viendo
+   la versión anterior.
+4. Sube los cambios a `main`.
 
-1. Crea un repositorio **privado** en GitHub y sube esta carpeta (la carpeta `publicar/` no hace falta: está en `.gitignore`).
-2. En el panel de Cloudflare: **Workers & Pages → Create application → Pages → Connect to Git**,
-   autoriza a Cloudflare a ver ese repositorio y elígelo.
-3. Configuración de la compilación:
-   - **Project name**: el nombre que quieras para la dirección (por ejemplo `comparador` → `comparador.pages.dev`).
-   - **Production branch**: `main`
-   - **Framework preset**: `None`
-   - **Build command**: `node scripts/preparar-publicacion.mjs`
-   - **Build output directory**: `publicar`
-4. Pulsa **Save and Deploy**. En uno o dos minutos estará en `https://<nombre>.pages.dev`.
+## Ideas para el futuro
 
-### Si Cloudflare te lleva a «Workers» en vez de «Pages»
+- Emparejar a mano los movimientos que la web no ha sabido emparejar.
+- Recordar de un mes a otro qué conceptos del banco corresponden a cuáles de la contabilidad.
+- Comparar varias cuentas bancarias a la vez.
+- Reconocer automáticamente los formatos de exportación de los bancos más habituales.
 
-Cloudflare ha juntado Workers y Pages en el mismo menú y a veces el asistente crea un *Worker*
-(la pantalla dice «Configure your Worker project» y pide un *Deploy command*). También funciona, gracias
-al archivo [`wrangler.jsonc`](wrangler.jsonc):
+¿Tienes una idea o has encontrado un fallo? Abre una *issue*.
 
-- **Project name**: el mismo que `name` en `wrangler.jsonc` (ahora `comparador`). Si eliges otro, cámbialo también ahí.
-- **Build command**: `node scripts/preparar-publicacion.mjs`
-- **Deploy command**: `npx wrangler deploy` (el que viene puesto)
-- **Path**: `/`
+## Créditos y licencia
 
-La diferencia es la dirección: en Workers es `https://<nombre>.<subdominio-de-tu-cuenta>.workers.dev`.
-El subdominio de la cuenta se puede cambiar una vez en *Workers & Pages → Account details → Subdomain*.
+Creado por Rodrigo de Funes Lombardía, con ayuda de [Claude Code](https://claude.com/claude-code).
 
-### Opción B: subir la carpeta a mano
-
-Sin GitHub. Pero ten en cuenta que un proyecto creado así **no se puede conectar después a Git**: cada
-actualización hay que volver a subirla a mano.
-
-1. Ejecuta `npm run publicar` para crear la carpeta `publicar/`.
-2. En Cloudflare: **Workers & Pages → Create application → Pages → Upload assets**, ponle nombre al proyecto
-   y arrastra la carpeta `publicar/`.
-3. Para actualizar: vuelve a ejecutar `npm run publicar`, entra en el proyecto, **Create new deployment** y
-   arrastra otra vez la carpeta.
-
-Los nombres de los menús de Cloudflare cambian de vez en cuando; si no encuentras alguno, busca
-«Pages» dentro de *Workers & Pages*.
-
-### Subir una versión nueva
-
-1. Haz los cambios y comprueba que los tests pasan (`npm test`).
-2. Si has añadido, quitado o renombrado archivos de la web, actualiza la lista `ARCHIVOS` de [`sw.js`](sw.js)
-   (los tests avisan si falta alguno). Esa lista decide también qué se publica.
-3. **Sube `CACHE_VERSION`** al principio de [`sw.js`](sw.js), con el formato `v-X.X.X`, y pon el mismo
-   número (sin `v-`) en `version` de [`package.json`](package.json); los tests comprueban que coinciden:
-   - `v-1.0.1` para correcciones pequeñas,
-   - `v-1.1.0` para mejoras o funciones nuevas,
-   - `v-2.0.0` para cambios grandes.
-
-   Sin este cambio, quien ya tenga la web instalada seguirá viendo la versión anterior,
-   porque se sirve desde la caché.
-4. Opción A: sube los cambios a la rama `main`. Opción B: vuelve a subir la carpeta `publicar/`.
-   La próxima vez que se abra la web con conexión aparecerá el aviso «Hay una versión nueva. Actualizar».
-
-Para probar en local exactamente lo que se va a publicar: `npm run publicar` y después
-`node scripts/servidor.mjs 8081 publicar` (abre <http://localhost:8081>). El servidor local no aplica las
-cabeceras de `_headers`; Cloudflare sí.
-
-### Alternativa: GitHub Pages
-
-También funciona en GitHub Pages sin cambios (rutas relativas y archivo `.nojekyll`), pero la dirección
-lleva tu usuario (`https://<usuario>.github.io/<repositorio>/`) y, en el plan gratuito, el repositorio tiene
-que ser público. Se activa en **Settings → Pages → Deploy from a branch** (`main`, carpeta raíz).
+Código bajo licencia [MIT](LICENSE). SheetJS se distribuye bajo su propia licencia
+([Apache 2.0](vendor/sheetjs/LICENSE)). Todos los datos de ejemplo son ficticios.
